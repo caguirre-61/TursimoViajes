@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Explorar Destinos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body id="page-catalog">
+
+  <!-- Navegación -->
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="active">🗺 Explorar</a>
+        <a href="perfil.html">👤 Perfil</a>
+        <a href="reservas.html">📋 Reservas</a>
+        <a href="calendario.html">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="stock.html">✈ Vuelos</a>
+        <a href="configuracion.html">⚙ Config</a>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar">AG</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Descubrí el mundo con VíaHorizonte</h1>
+      <p class="hero-sub">Destinos únicos, experiencias inolvidables. Tu próxima aventura empieza aquí.</p>
+
+      <!-- Buscador -->
+      <div class="search-bar">
+        <input type="text" placeholder="¿A dónde querés ir?" />
+        <input type="date" />
+        <input type="text" placeholder="Presupuesto máx." />
+        <button class="btn btn-accent">🔍 Buscar</button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filter-pills">
+        <span class="filter-pill active" onclick="filterDest(this, 'all')">🌎 Todos</span>
+        <span class="filter-pill" onclick="filterDest(this, 'playa')">🏖 Playa</span>
+        <span class="filter-pill" onclick="filterDest(this, 'montana')">🏔 Montaña</span>
+        <span class="filter-pill" onclick="filterDest(this, 'historico')">🏛 Histórico</span>
+        <span class="filter-pill" onclick="filterDest(this, 'aventura')">🧗 Aventura</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Catálogo -->
+  <section class="page-section">
+    <div class="container">
+      <h2 class="section-title">Destinos Destacados</h2>
+      <p class="section-subtitle">Los viajes más elegidos por nuestra comunidad este mes</p>
+
+      <div class="dest-grid" id="destGrid">
+
+        <article class="card dest-card" data-cat="playa">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=600&q=80" alt="Cancún">
+            <span class="badge badge-info dest-badge">🏖 Playa</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Cancún</h3>
+            <p class="dest-loc">📍 México, Quintana Roo</p>
+            <div class="stars">★★★★★</div>
+            <div class="dest-meta">
+              <span class="dest-price">$850 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="historico">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80" alt="Madrid">
+            <span class="badge badge-warning dest-badge">🏛 Histórico</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Madrid</h3>
+            <p class="dest-loc">📍 España, Comunidad de Madrid</p>
+            <div class="stars">★★★★☆</div>
+            <div class="dest-meta">
+              <span class="dest-price">$1.200 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="montana">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1531761535209-180857e963b9?w=600&q=80" alt="Bariloche">
+            <span class="badge badge-success dest-badge">🏔 Montaña</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Bariloche</h3>
+            <p class="dest-loc">📍 Argentina, Río Negro</p>
+            <div class="stars">★★★★★</div>
+            <div class="dest-meta">
+              <span class="dest-price">$420 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="aventura">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1504598318550-17ded0173a6d?w=600&q=80" alt="Machu Picchu">
+            <span class="badge badge-danger dest-badge">🧗 Aventura</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Machu Picchu</h3>
+            <p class="dest-loc">📍 Perú, Cusco</p>
+            <div class="stars">★★★★★</div>
+            <div class="dest-meta">
+              <span class="dest-price">$680 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="playa">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1501615850558-fc4b6c07e96d?w=600&q=80" alt="Punta Cana">
+            <span class="badge badge-info dest-badge">🏖 Playa</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Punta Cana</h3>
+            <p class="dest-loc">📍 República Dominicana</p>
+            <div class="stars">★★★★☆</div>
+            <div class="dest-meta">
+              <span class="dest-price">$950 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="historico">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&q=80" alt="Roma">
+            <span class="badge badge-warning dest-badge">🏛 Histórico</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Roma</h3>
+            <p class="dest-loc">📍 Italia, Lazio</p>
+            <div class="stars">★★★★★</div>
+            <div class="dest-meta">
+              <span class="dest-price">$1.450 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="montana">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80" alt="Ushuaia">
+            <span class="badge badge-success dest-badge">🏔 Montaña</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Ushuaia</h3>
+            <p class="dest-loc">📍 Argentina, Tierra del Fuego</p>
+            <div class="stars">★★★★☆</div>
+            <div class="dest-meta">
+              <span class="dest-price">$380 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card dest-card" data-cat="aventura">
+          <div class="dest-img">
+            <img src="https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=600&q=80" alt="Torres del Paine">
+            <span class="badge badge-danger dest-badge">🧗 Aventura</span>
+          </div>
+          <div class="dest-info">
+            <h3 class="dest-name">Torres del Paine</h3>
+            <p class="dest-loc">📍 Chile, Magallanes</p>
+            <div class="stars">★★★★★</div>
+            <div class="dest-meta">
+              <span class="dest-price">$590 <small>/ persona</small></span>
+              <a href="reservas.html" class="btn btn-primary btn-sm">Reservar</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística &nbsp;|&nbsp;
+    <a href="configuracion.html">Configuración</a> &nbsp;|&nbsp;
+    <a href="#">Términos</a>
+  </footer>
+
+  <script>
+    function filterDest(el, cat) {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('.dest-card').forEach(c => {
+        if (cat === 'all' || c.dataset.cat === cat) {
+          c.style.display = '';
+        } else {
+          c.style.display = 'none';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
