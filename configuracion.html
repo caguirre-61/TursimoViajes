@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Configuración</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Page-specific: #page-config ── */
+    #page-config .config-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+    @media(max-width:720px){ #page-config .config-layout { grid-template-columns: 1fr; } }
+
+    /* Sidebar nav */
+    #page-config .config-nav {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(29,53,87,.08);
+      overflow: hidden;
+      position: sticky;
+      top: 90px;
+    }
+    #page-config .config-nav a {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: .85rem 1.2rem;
+      font-size: .88rem;
+      color: #555;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: all .18s;
+    }
+    #page-config .config-nav a:hover  { background: #f7fafd; color: #1D3557; border-left-color: #d0d8e4; }
+    #page-config .config-nav a.active { background: #edf3fb; color: #1D3557; font-weight: 600; border-left-color: #1D3557; }
+
+    /* Panels */
+    #page-config .config-panel {
+      display: none;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    #page-config .config-panel.show { display: flex; }
+
+    #page-config .config-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(29,53,87,.08);
+      overflow: hidden;
+    }
+    #page-config .config-card-header {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid #f0f4f8;
+      font-weight: 700;
+      font-size: .95rem;
+      color: #1D3557;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    #page-config .config-card-body { padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+
+    /* Toggle switch */
+    #page-config .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    #page-config .toggle-info { flex: 1; }
+    #page-config .toggle-label { font-size: .9rem; font-weight: 600; color: #333; }
+    #page-config .toggle-desc  { font-size: .78rem; color: #888; margin-top: .15rem; }
+
+    #page-config .switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+    #page-config .switch input { display: none; }
+    #page-config .slider {
+      position: absolute; inset: 0;
+      background: #ccc; border-radius: 99px; cursor: pointer;
+      transition: background .25s;
+    }
+    #page-config .slider::before {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px; left: 3px;
+      transition: transform .25s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    #page-config .switch input:checked + .slider { background: #1D3557; }
+    #page-config .switch input:checked + .slider::before { transform: translateX(20px); }
+
+    /* Form fields */
+    #page-config .form-row { display: flex; flex-direction: column; gap: .4rem; }
+    #page-config .form-row label { font-size: .82rem; font-weight: 600; color: #555; }
+    #page-config .form-row input,
+    #page-config .form-row select {
+      padding: .6rem 1rem;
+      border: 1.5px solid #d0d8e4;
+      border-radius: 9px;
+      font-size: .9rem;
+      color: #333;
+      background: #fff;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #page-config .form-row input:focus,
+    #page-config .form-row select:focus { border-color: #457B9D; }
+    #page-config .form-row .helper { font-size: .75rem; color: #aaa; }
+
+    /* Inline row of fields */
+    #page-config .fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:560px){ #page-config .fields-row { grid-template-columns: 1fr; } }
+
+    /* Checkbox */
+    #page-config .check-row { display: flex; align-items: flex-start; gap: .7rem; cursor: pointer; }
+    #page-config .check-row input[type=checkbox] { margin-top: .15rem; accent-color: #1D3557; width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+    #page-config .check-row .check-label  { font-size: .88rem; font-weight: 600; color: #333; }
+    #page-config .check-row .check-desc   { font-size: .76rem; color: #888; margin-top: .1rem; }
+
+    /* Buttons */
+    #page-config .save-btn {
+      align-self: flex-end;
+      padding: .6rem 1.6rem;
+      background: #1D3557;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    #page-config .save-btn:hover  { background: #16304d; }
+    #page-config .save-btn:active { transform: scale(.97); }
+
+    #page-config .success-toast {
+      display: none;
+      align-items: center;
+      gap: .6rem;
+      padding: .7rem 1.2rem;
+      background: #d4f1eb;
+      color: #1a7a65;
+      border-radius: 10px;
+      font-size: .84rem;
+      font-weight: 600;
+    }
+
+    /* 2FA code display */
+    #page-config .qr-placeholder {
+      width: 120px; height: 120px;
+      border: 2px dashed #ccd;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      background: #f8f9fa;
+      margin: 0 auto;
+    }
+
+    /* FAQ accordion */
+    #page-config .faq-item { border-bottom: 1px solid #f0f0f0; }
+    #page-config .faq-q {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .85rem 0;
+      font-size: .88rem;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      user-select: none;
+    }
+    #page-config .faq-q:hover { color: #1D3557; }
+    #page-config .faq-a {
+      display: none;
+      font-size: .83rem;
+      color: #666;
+      padding-bottom: .85rem;
+      line-height: 1.6;
+    }
+    #page-config .faq-item.open .faq-a { display: block; }
+    #page-config .faq-item.open .faq-icon { transform: rotate(45deg); }
+    #page-config .faq-icon { transition: transform .2s; font-size: 1.1rem; color: #aaa; }
+
+    /* Danger zone */
+    #page-config .danger-zone {
+      border: 1.5px solid #fde8ea;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    #page-config .danger-info .dz-title { font-weight: 700; font-size: .88rem; color: #B01A24; }
+    #page-config .danger-info .dz-desc  { font-size: .78rem; color: #888; margin-top: .2rem; }
+    #page-config .btn-danger-outline {
+      padding: .5rem 1.1rem;
+      border: 1.5px solid #E63946;
+      border-radius: 8px;
+      background: transparent;
+      color: #E63946;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    #page-config .btn-danger-outline:hover { background: #E63946; color: #fff; }
+  </style>
+</head>
+<body id="page-config">
+
+  <!-- Navegación -->
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🗺 Explorar</a>
+        <a href="perfil.html">👤 Perfil</a>
+        <a href="reservas.html">📋 Reservas</a>
+        <a href="calendario.html">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="stock.html">✈ Vuelos</a>
+        <a href="configuracion.html" class="active">⚙ Config</a>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar">AG</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page header -->
+  <section style="background:linear-gradient(135deg,#1D3557 0%,#457B9D 100%);padding:2.5rem 0;color:#fff;margin-bottom:2rem;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+      <h1 style="font-size:1.75rem;font-weight:700;margin:0 0 .25rem;">⚙ Configuración del Sistema</h1>
+      <p style="opacity:.8;margin:0;">Personalizá la interfaz, seguridad y notificaciones de tu cuenta</p>
+    </div>
+  </section>
+
+  <section class="page-section" style="padding:0 0 3rem;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+      <div class="config-layout">
+
+        <!-- Sidebar -->
+        <nav class="config-nav">
+          <a href="#" class="active" onclick="showPanel('interfaz',this)">🎨 Interfaz</a>
+          <a href="#" onclick="showPanel('seguridad',this)">🔐 Seguridad</a>
+          <a href="#" onclick="showPanel('notificaciones',this)">🔔 Notificaciones</a>
+          <a href="#" onclick="showPanel('soporte',this)">💬 Soporte</a>
+        </nav>
+
+        <!-- Content -->
+        <div>
+
+          <!-- Panel: Interfaz -->
+          <div class="config-panel show" id="panel-interfaz">
+
+            <div class="config-card">
+              <div class="config-card-header">🌓 Apariencia</div>
+              <div class="config-card-body">
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">Modo Oscuro</div>
+                    <div class="toggle-desc">Cambia el tema general de la interfaz a fondo oscuro</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="darkMode" onchange="toggleDark(this)">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">Animaciones reducidas</div>
+                    <div class="toggle-desc">Minimiza transiciones para mejor accesibilidad</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">Navegación compacta</div>
+                    <div class="toggle-desc">Oculta etiquetas del menú y solo muestra iconos</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <div class="config-card-header">🌐 Idioma y Región</div>
+              <div class="config-card-body">
+                <div class="fields-row">
+                  <div class="form-row">
+                    <label>Idioma de la interfaz</label>
+                    <select>
+                      <option selected>🇦🇷 Español (Argentina)</option>
+                      <option>🇺🇸 English (US)</option>
+                      <option>🇧🇷 Português (Brasil)</option>
+                      <option>🇫🇷 Français</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <label>Moneda de visualización</label>
+                    <select>
+                      <option>💵 USD — Dólar estadounidense</option>
+                      <option selected>🇦🇷 ARS — Peso argentino</option>
+                      <option>💶 EUR — Euro</option>
+                      <option>🇧🇷 BRL — Real brasileño</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fields-row">
+                  <div class="form-row">
+                    <label>Zona horaria</label>
+                    <select>
+                      <option selected>America/Buenos_Aires (UTC-3)</option>
+                      <option>America/Santiago (UTC-3)</option>
+                      <option>America/Lima (UTC-5)</option>
+                      <option>Europe/Madrid (UTC+2)</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <label>Formato de fecha</label>
+                    <select>
+                      <option selected>DD/MM/AAAA</option>
+                      <option>MM/DD/YYYY</option>
+                      <option>AAAA-MM-DD</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="toastInterfaz" class="success-toast">✅ Preferencias de interfaz guardadas.</div>
+                <button class="save-btn" onclick="showToast('toastInterfaz')">💾 Guardar cambios</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Panel: Seguridad -->
+          <div class="config-panel" id="panel-seguridad">
+
+            <div class="config-card">
+              <div class="config-card-header">🔑 Cambio de Contraseña</div>
+              <div class="config-card-body">
+                <div class="form-row">
+                  <label>Contraseña actual</label>
+                  <input type="password" placeholder="••••••••">
+                </div>
+                <div class="fields-row">
+                  <div class="form-row">
+                    <label>Nueva contraseña</label>
+                    <input type="password" id="newPass" placeholder="Mínimo 8 caracteres" oninput="checkStrength(this.value)">
+                    <div id="strengthBar" style="height:4px;border-radius:99px;background:#eee;margin-top:.4rem;overflow:hidden;"><div id="strengthFill" style="height:100%;width:0%;border-radius:99px;transition:width .3s,background .3s;"></div></div>
+                    <span id="strengthLabel" class="helper" style="font-size:.72rem;"></span>
+                  </div>
+                  <div class="form-row">
+                    <label>Repetir nueva contraseña</label>
+                    <input type="password" placeholder="Confirmar contraseña">
+                  </div>
+                </div>
+                <div id="toastPass" class="success-toast">✅ Contraseña actualizada correctamente.</div>
+                <button class="save-btn" onclick="showToast('toastPass')">🔒 Actualizar contraseña</button>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <div class="config-card-header">📱 Verificación en Dos Pasos (2FA)</div>
+              <div class="config-card-body">
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">Activar 2FA</div>
+                    <div class="toggle-desc">Aumenta la seguridad de tu cuenta con un segundo factor de autenticación</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="twofa" onchange="toggle2FA(this)">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div id="qrSection" style="display:none;text-align:center;">
+                  <p style="font-size:.84rem;color:#555;margin-bottom:1rem;">Escaneá este código con tu app de autenticación (Google Authenticator, Authy, etc.)</p>
+                  <div class="qr-placeholder">📷</div>
+                  <p style="font-size:.76rem;color:#aaa;margin-top:.6rem;">Código manual: <code style="background:#f0f4f8;padding:.1rem .4rem;border-radius:4px;">VH-2FA-XK9-2025</code></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <div class="config-card-header">⚠️ Zona Peligrosa</div>
+              <div class="config-card-body">
+                <div class="danger-zone">
+                  <div class="danger-info">
+                    <div class="dz-title">Cerrar todas las sesiones activas</div>
+                    <div class="dz-desc">Desconectá tu cuenta de todos los dispositivos vinculados</div>
+                  </div>
+                  <button class="btn-danger-outline" onclick="alert('Sesiones cerradas.')">🚪 Cerrar sesiones</button>
+                </div>
+                <div class="danger-zone">
+                  <div class="danger-info">
+                    <div class="dz-title">Eliminar cuenta permanentemente</div>
+                    <div class="dz-desc">Esta acción es irreversible. Todos tus datos y reservas se borrarán.</div>
+                  </div>
+                  <button class="btn-danger-outline" onclick="if(confirm('¿Seguro que querés eliminar tu cuenta? Esta acción es irreversible.')) alert('Cuenta eliminada.')">🗑 Eliminar cuenta</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Panel: Notificaciones -->
+          <div class="config-panel" id="panel-notificaciones">
+
+            <div class="config-card">
+              <div class="config-card-header">🔔 Alertas y Avisos</div>
+              <div class="config-card-body">
+                <label class="check-row">
+                  <input type="checkbox" checked>
+                  <div>
+                    <div class="check-label">✈ Alertas de vuelos baratos</div>
+                    <div class="check-desc">Recibí notificaciones cuando haya ofertas en tus destinos favoritos</div>
+                  </div>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" checked>
+                  <div>
+                    <div class="check-label">📧 Confirmaciones por email</div>
+                    <div class="check-desc">Enviamos un resumen de cada reserva y cancelación a tu correo</div>
+                  </div>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox">
+                  <div>
+                    <div class="check-label">📰 Newsletter mensual</div>
+                    <div class="check-desc">Novedades, destinos tendencia y promociones exclusivas de VíaHorizonte</div>
+                  </div>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" checked>
+                  <div>
+                    <div class="check-label">⏰ Recordatorios de viaje</div>
+                    <div class="check-desc">Te avisamos 24 hs y 2 hs antes del check-in o salida del vuelo</div>
+                  </div>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox">
+                  <div>
+                    <div class="check-label">⚠️ Alertas de stock crítico (Admin)</div>
+                    <div class="check-desc">Recibí avisos cuando un vuelo tenga menos del 10% de disponibilidad</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <div class="config-card-header">📡 Canal de Notificaciones</div>
+              <div class="config-card-body">
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">Notificaciones push (browser)</div>
+                    <div class="toggle-desc">Recibí alertas directamente en el navegador</div>
+                  </div>
+                  <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">Notificaciones por email</div>
+                    <div class="toggle-desc">Enviadas a agomez@email.com</div>
+                  </div>
+                  <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <div class="toggle-label">SMS</div>
+                    <div class="toggle-desc">Alertas urgentes al +54 9 11 xxxx-xxxx</div>
+                  </div>
+                  <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <div id="toastNotif" class="success-toast">✅ Preferencias de notificaciones guardadas.</div>
+                <button class="save-btn" onclick="showToast('toastNotif')">💾 Guardar preferencias</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Panel: Soporte -->
+          <div class="config-panel" id="panel-soporte">
+
+            <div class="config-card">
+              <div class="config-card-header">❓ Preguntas Frecuentes</div>
+              <div class="config-card-body" style="padding-top:.5rem;padding-bottom:.5rem;">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-q">¿Cómo cancelo una reserva? <span class="faq-icon">+</span></div>
+                  <div class="faq-a">Ingresá al módulo <strong>Historial</strong>, localizá la reserva que querés cancelar y hacé clic en el botón "Cancelar". El reembolso se procesa según la política de la aerolínea correspondiente, generalmente dentro de 5 a 10 días hábiles.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-q">¿Puedo cambiar las fechas de un vuelo ya reservado? <span class="faq-icon">+</span></div>
+                  <div class="faq-a">Sí, siempre que la aerolínea lo permita. Accedé a tu reserva en el historial y seleccioná "Modificar fechas". En caso de que no sea posible online, te redirigiremos a atención al cliente.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-q">¿Qué métodos de pago se aceptan? <span class="faq-icon">+</span></div>
+                  <div class="faq-a">Aceptamos tarjetas de crédito y débito (Visa, Mastercard, American Express), transferencias bancarias y pagos en cuotas sin interés con tarjetas adheridas al programa.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-q">¿Cómo activo la verificación en dos pasos (2FA)? <span class="faq-icon">+</span></div>
+                  <div class="faq-a">Desde esta misma pantalla de Configuración, hacé clic en "Seguridad" en el menú lateral y activá el switch de "Verificación en dos pasos". Seguí los pasos para vincular tu app de autenticación.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-q">¿Cómo descargo mi factura o voucher? <span class="faq-icon">+</span></div>
+                  <div class="faq-a">En el módulo de <strong>Historial</strong>, cada fila de reserva completada tiene un botón "Descargar Factura" que genera el comprobante en formato PDF para que puedas guardarlo o imprimirlo.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <div class="config-card-header">📬 Contactar Soporte Técnico</div>
+              <div class="config-card-body">
+                <div class="form-row">
+                  <label>Asunto</label>
+                  <select>
+                    <option>Problema con una reserva</option>
+                    <option>Error técnico en la plataforma</option>
+                    <option>Consulta sobre facturación</option>
+                    <option>Sugerencia de mejora</option>
+                    <option>Otro</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Mensaje</label>
+                  <textarea placeholder="Describí tu consulta con el mayor detalle posible…" rows="4" style="padding:.6rem 1rem;border:1.5px solid #d0d8e4;border-radius:9px;font-size:.88rem;font-family:inherit;resize:vertical;outline:none;"></textarea>
+                </div>
+                <div id="toastSoporte" class="success-toast">✅ Mensaje enviado. Te responderemos en menos de 24 hs.</div>
+                <button class="save-btn" onclick="showToast('toastSoporte')">📤 Enviar mensaje</button>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <div class="config-card-header">📞 Información de Contacto Directo</div>
+              <div class="config-card-body" style="gap:.75rem;">
+                <div style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;">
+                  <span style="font-size:1.2rem;">📧</span>
+                  <div><strong>Email:</strong> soporte@viahorizonte.com</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;">
+                  <span style="font-size:1.2rem;">📱</span>
+                  <div><strong>WhatsApp:</strong> +54 9 11 5500-0000 · Lun a Vie 9–18 hs</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:.7rem;font-size:.88rem;">
+                  <span style="font-size:1.2rem;">🌐</span>
+                  <div><strong>Base de conocimiento:</strong> <a href="#" style="color:#457B9D;">docs.viahorizonte.com</a></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística &nbsp;|&nbsp;
+    <a href="configuracion.html">Configuración</a> &nbsp;|&nbsp;
+    <a href="#">Términos</a>
+  </footer>
+
+  <script>
+    function showPanel(id, el) {
+      document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('show'));
+      document.getElementById('panel-' + id).classList.add('show');
+      document.querySelectorAll('.config-nav a').forEach(a => a.classList.remove('active'));
+      el.classList.add('active');
+      return false;
+    }
+
+    function showToast(id) {
+      const t = document.getElementById(id);
+      t.style.display = 'flex';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+
+    function toggleDark(cb) {
+      document.body.style.filter = cb.checked ? 'invert(1) hue-rotate(180deg)' : '';
+    }
+
+    function toggle2FA(cb) {
+      document.getElementById('qrSection').style.display = cb.checked ? 'block' : 'none';
+    }
+
+    function toggleFaq(item) {
+      item.classList.toggle('open');
+    }
+
+    function checkStrength(val) {
+      const fill = document.getElementById('strengthFill');
+      const lbl  = document.getElementById('strengthLabel');
+      if (!val) { fill.style.width = '0%'; lbl.textContent = ''; return; }
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const map = [
+        { w: '25%', bg: '#E63946', txt: 'Muy débil' },
+        { w: '50%', bg: '#e9c46a', txt: 'Débil' },
+        { w: '75%', bg: '#457B9D', txt: 'Media' },
+        { w: '100%',bg: '#2a9d8f', txt: 'Fuerte' },
+      ];
+      const m = map[score - 1] || map[0];
+      fill.style.width = m.w;
+      fill.style.background = m.bg;
+      lbl.textContent = m.txt;
+      lbl.style.color = m.bg;
+    }
+  </script>
+
+</body>
+</html>

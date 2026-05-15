@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Page-specific: #page-dashboard ── */
+    #page-dashboard .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    #page-dashboard .kpi-card {
+      background: var(--color-surface, #fff);
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      box-shadow: 0 2px 12px rgba(29,53,87,.08);
+      border-left: 4px solid var(--color-primary, #1D3557);
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
+    #page-dashboard .kpi-card.accent { border-left-color: var(--color-secondary, #457B9D); }
+    #page-dashboard .kpi-card.success { border-left-color: #2a9d8f; }
+    #page-dashboard .kpi-card.warn   { border-left-color: #e9c46a; }
+    #page-dashboard .kpi-icon  { font-size: 1.7rem; }
+    #page-dashboard .kpi-label { font-size: .78rem; color: #6c757d; text-transform: uppercase; letter-spacing: .06em; }
+    #page-dashboard .kpi-value { font-size: 2rem; font-weight: 700; color: var(--color-primary, #1D3557); line-height: 1; }
+    #page-dashboard .kpi-sub   { font-size: .8rem; color: #6c757d; }
+
+    #page-dashboard .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    @media(max-width:800px){ #page-dashboard .charts-grid { grid-template-columns: 1fr; } }
+
+    #page-dashboard .chart-box {
+      background: var(--color-surface, #fff);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(29,53,87,.08);
+    }
+    #page-dashboard .chart-title {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--color-primary, #1D3557);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* Bar chart */
+    #page-dashboard .bar-chart { display: flex; flex-direction: column; gap: .75rem; }
+    #page-dashboard .bar-row   { display: flex; align-items: center; gap: .75rem; font-size: .82rem; }
+    #page-dashboard .bar-label { width: 110px; color: #444; flex-shrink: 0; }
+    #page-dashboard .bar-track { flex: 1; background: #eef2f7; border-radius: 99px; height: 10px; overflow: hidden; }
+    #page-dashboard .bar-fill  { height: 100%; border-radius: 99px; background: var(--color-primary, #1D3557); transition: width .6s; }
+    #page-dashboard .bar-fill.s{ background: var(--color-secondary, #457B9D); }
+    #page-dashboard .bar-fill.g{ background: #2a9d8f; }
+    #page-dashboard .bar-fill.y{ background: #e9c46a; }
+    #page-dashboard .bar-fill.r{ background: var(--color-danger, #E63946); }
+    #page-dashboard .bar-pct   { width: 36px; text-align: right; color: #666; font-size: .78rem; }
+
+    /* Line chart SVG */
+    #page-dashboard .line-svg  { width: 100%; height: 140px; }
+
+    /* Donut */
+    #page-dashboard .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    #page-dashboard .donut-svg  { width: 120px; height: 120px; }
+    #page-dashboard .donut-legend { width: 100%; }
+    #page-dashboard .legend-item { display: flex; align-items: center; gap: .5rem; font-size: .8rem; margin-bottom: .35rem; }
+    #page-dashboard .legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Ranking table */
+    #page-dashboard .ranking-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    #page-dashboard .ranking-table th {
+      text-align: left; padding: .6rem .8rem;
+      background: #f0f4f8; color: #555;
+      font-weight: 600; font-size: .75rem;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    #page-dashboard .ranking-table td { padding: .65rem .8rem; border-bottom: 1px solid #f0f0f0; }
+    #page-dashboard .ranking-table tr:last-child td { border-bottom: none; }
+    #page-dashboard .rank-badge { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary, #1D3557); color: #fff; font-size: .72rem; font-weight: 700; text-align: center; line-height: 22px; }
+    #page-dashboard .rank-badge.gold   { background: #e9c46a; color: #6b4c00; }
+    #page-dashboard .rank-badge.silver { background: #b0bec5; color: #fff; }
+    #page-dashboard .rank-badge.bronze { background: #c8956c; color: #fff; }
+    #page-dashboard .stars-sm { color: #f4a800; font-size: .8rem; letter-spacing: -.05em; }
+    #page-dashboard .trend-up   { color: #2a9d8f; font-weight: 600; }
+    #page-dashboard .trend-down { color: var(--color-danger, #E63946); font-weight: 600; }
+  </style>
+</head>
+<body id="page-dashboard">
+
+  <!-- Navegación -->
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🗺 Explorar</a>
+        <a href="perfil.html">👤 Perfil</a>
+        <a href="reservas.html">📋 Reservas</a>
+        <a href="calendario.html">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html" class="active">📊 Dashboard</a>
+        <a href="stock.html">✈ Vuelos</a>
+        <a href="configuracion.html">⚙ Config</a>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar">AG</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page header -->
+  <section class="page-hero" style="background:linear-gradient(135deg,#1D3557 0%,#457B9D 100%);padding:2.5rem 0;color:#fff;margin-bottom:2rem;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+      <h1 style="font-size:1.75rem;font-weight:700;margin:0 0 .25rem;">📊 Dashboard de Métricas</h1>
+      <p style="opacity:.8;margin:0;">Visión global del rendimiento de la plataforma · Mayo 2025</p>
+    </div>
+  </section>
+
+  <section class="page-section" style="padding:0 0 3rem;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-icon">🌍</span>
+          <span class="kpi-label">Destino del Mes</span>
+          <span class="kpi-value" style="font-size:1.3rem;">Bariloche</span>
+          <span class="kpi-sub">+18% respecto al mes anterior</span>
+        </div>
+        <div class="kpi-card accent">
+          <span class="kpi-icon">👥</span>
+          <span class="kpi-label">Usuarios Activos</span>
+          <span class="kpi-value">3.842</span>
+          <span class="kpi-sub">Últimos 30 días</span>
+        </div>
+        <div class="kpi-card success">
+          <span class="kpi-icon">📋</span>
+          <span class="kpi-label">Reservas Globales</span>
+          <span class="kpi-value">1.267</span>
+          <span class="kpi-sub">Este mes · ↑ 12% vs anterior</span>
+        </div>
+        <div class="kpi-card warn">
+          <span class="kpi-icon">💰</span>
+          <span class="kpi-label">Facturación Total</span>
+          <span class="kpi-value" style="font-size:1.5rem;">$2.1M</span>
+          <span class="kpi-sub">USD · Acumulado anual</span>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="charts-grid">
+
+        <!-- Bar chart: destinos más elegidos -->
+        <div class="chart-box">
+          <div class="chart-title">🏆 Destinos Más Vacacionados</div>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <span class="bar-label">Cancún</span>
+              <div class="bar-track"><div class="bar-fill" style="width:88%"></div></div>
+              <span class="bar-pct">88%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Madrid</span>
+              <div class="bar-track"><div class="bar-fill s" style="width:74%"></div></div>
+              <span class="bar-pct">74%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Bariloche</span>
+              <div class="bar-track"><div class="bar-fill g" style="width:68%"></div></div>
+              <span class="bar-pct">68%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Machu Picchu</span>
+              <div class="bar-track"><div class="bar-fill y" style="width:55%"></div></div>
+              <span class="bar-pct">55%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Roma</span>
+              <div class="bar-track"><div class="bar-fill r" style="width:47%"></div></div>
+              <span class="bar-pct">47%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Punta Cana</span>
+              <div class="bar-track"><div class="bar-fill" style="width:39%;opacity:.7"></div></div>
+              <span class="bar-pct">39%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Torres Paine</span>
+              <div class="bar-track"><div class="bar-fill s" style="width:31%;opacity:.7"></div></div>
+              <span class="bar-pct">31%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Ushuaia</span>
+              <div class="bar-track"><div class="bar-fill g" style="width:26%;opacity:.7"></div></div>
+              <span class="bar-pct">26%</span>
+            </div>
+          </div>
+
+          <!-- Line chart: estacionalidad -->
+          <div class="chart-title" style="margin-top:1.75rem;">📈 Estacionalidad de Reservas (2025)</div>
+          <svg class="line-svg" viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg">
+            <!-- Grid lines -->
+            <line x1="40" y1="10"  x2="540" y2="10"  stroke="#eef2f7" stroke-width="1"/>
+            <line x1="40" y1="45"  x2="540" y2="45"  stroke="#eef2f7" stroke-width="1"/>
+            <line x1="40" y1="80"  x2="540" y2="80"  stroke="#eef2f7" stroke-width="1"/>
+            <line x1="40" y1="115" x2="540" y2="115" stroke="#eef2f7" stroke-width="1"/>
+            <!-- Y labels -->
+            <text x="34" y="14"  font-size="9" fill="#aaa" text-anchor="end">400</text>
+            <text x="34" y="49"  font-size="9" fill="#aaa" text-anchor="end">300</text>
+            <text x="34" y="84"  font-size="9" fill="#aaa" text-anchor="end">200</text>
+            <text x="34" y="119" font-size="9" fill="#aaa" text-anchor="end">100</text>
+            <!-- Area fill -->
+            <polygon points="40,115 83,95 126,105 169,80 212,70 255,55 298,45 341,60 384,50 427,30 470,20 513,35 513,115" fill="#1D3557" opacity="0.08"/>
+            <!-- Line -->
+            <polyline points="40,115 83,95 126,105 169,80 212,70 255,55 298,45 341,60 384,50 427,30 470,20 513,35"
+              fill="none" stroke="#1D3557" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- Dots -->
+            <circle cx="40"  cy="115" r="3.5" fill="#1D3557"/>
+            <circle cx="83"  cy="95"  r="3.5" fill="#1D3557"/>
+            <circle cx="126" cy="105" r="3.5" fill="#1D3557"/>
+            <circle cx="169" cy="80"  r="3.5" fill="#457B9D"/>
+            <circle cx="212" cy="70"  r="3.5" fill="#457B9D"/>
+            <circle cx="255" cy="55"  r="3.5" fill="#457B9D"/>
+            <circle cx="298" cy="45"  r="3.5" fill="#1D3557"/>
+            <circle cx="341" cy="60"  r="3.5" fill="#1D3557"/>
+            <circle cx="384" cy="50"  r="3.5" fill="#1D3557"/>
+            <circle cx="427" cy="30"  r="3.5" fill="#e63946"/>
+            <circle cx="470" cy="20"  r="3.5" fill="#e63946"/>
+            <circle cx="513" cy="35"  r="3.5" fill="#457B9D"/>
+            <!-- X labels -->
+            <text x="40"  y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Ene</text>
+            <text x="83"  y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Feb</text>
+            <text x="126" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Mar</text>
+            <text x="169" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Abr</text>
+            <text x="212" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">May</text>
+            <text x="255" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Jun</text>
+            <text x="298" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Jul</text>
+            <text x="341" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Ago</text>
+            <text x="384" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Sep</text>
+            <text x="427" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Oct</text>
+            <text x="470" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Nov</text>
+            <text x="513" y="133" font-size="8.5" fill="#aaa" text-anchor="middle">Dic</text>
+          </svg>
+        </div>
+
+        <!-- Right col: donut + mini stats -->
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+          <div class="chart-box">
+            <div class="chart-title">🌐 Distribución por Categoría</div>
+            <div class="donut-wrap">
+              <svg class="donut-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <!-- Playa 35% -->
+                <circle cx="60" cy="60" r="40" fill="none" stroke="#1D3557" stroke-width="20"
+                  stroke-dasharray="87.96 213.63" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+                <!-- Histórico 28% -->
+                <circle cx="60" cy="60" r="40" fill="none" stroke="#457B9D" stroke-width="20"
+                  stroke-dasharray="70.37 231.22" stroke-dashoffset="-87.96" transform="rotate(-90 60 60)"/>
+                <!-- Aventura 22% -->
+                <circle cx="60" cy="60" r="40" fill="none" stroke="#2a9d8f" stroke-width="20"
+                  stroke-dasharray="55.29 246.30" stroke-dashoffset="-158.33" transform="rotate(-90 60 60)"/>
+                <!-- Montaña 15% -->
+                <circle cx="60" cy="60" r="40" fill="none" stroke="#e9c46a" stroke-width="20"
+                  stroke-dasharray="37.70 263.89" stroke-dashoffset="-213.63" transform="rotate(-90 60 60)"/>
+                <text x="60" y="64" text-anchor="middle" font-size="11" font-weight="700" fill="#1D3557">100%</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:#1D3557"></span>🏖 Playa — 35%</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#457B9D"></span>🏛 Histórico — 28%</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#2a9d8f"></span>🧗 Aventura — 22%</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#e9c46a"></span>🏔 Montaña — 15%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-box" style="flex:1;">
+            <div class="chart-title">⚡ Actividad Reciente</div>
+            <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.82rem;">
+              <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid #f0f0f0;">
+                <span style="font-size:1.1rem;">🟢</span>
+                <div><strong>Nueva reserva</strong><br><span style="color:#888;">Cancún · hace 4 min</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid #f0f0f0;">
+                <span style="font-size:1.1rem;">🔴</span>
+                <div><strong>Cancelación</strong><br><span style="color:#888;">Punta Cana · hace 11 min</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid #f0f0f0;">
+                <span style="font-size:1.1rem;">✈️</span>
+                <div><strong>Vuelo AR-2841 completado</strong><br><span style="color:#888;">Bariloche · hace 32 min</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;">
+                <span style="font-size:1.1rem;">👤</span>
+                <div><strong>Nuevo usuario registrado</strong><br><span style="color:#888;">hace 1 h</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ranking table -->
+      <div class="chart-box">
+        <div class="chart-title">🏅 Ranking de Aerolíneas Asociadas</div>
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Aerolínea</th>
+              <th>Vuelos Operados</th>
+              <th>Valoración</th>
+              <th>Puntualidad</th>
+              <th>Tendencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank-badge gold">1</span></td>
+              <td><strong>Aerolíneas Argentinas</strong></td>
+              <td>312</td>
+              <td><span class="stars-sm">★★★★★</span></td>
+              <td>96%</td>
+              <td class="trend-up">↑ +8%</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge silver">2</span></td>
+              <td><strong>LATAM Airlines</strong></td>
+              <td>287</td>
+              <td><span class="stars-sm">★★★★☆</span></td>
+              <td>93%</td>
+              <td class="trend-up">↑ +5%</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge bronze">3</span></td>
+              <td><strong>Iberia</strong></td>
+              <td>194</td>
+              <td><span class="stars-sm">★★★★☆</span></td>
+              <td>91%</td>
+              <td class="trend-down">↓ -2%</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge">4</span></td>
+              <td>Copa Airlines</td>
+              <td>148</td>
+              <td><span class="stars-sm">★★★★☆</span></td>
+              <td>89%</td>
+              <td class="trend-up">↑ +3%</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge">5</span></td>
+              <td>Air Europa</td>
+              <td>103</td>
+              <td><span class="stars-sm">★★★☆☆</span></td>
+              <td>84%</td>
+              <td class="trend-down">↓ -4%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística &nbsp;|&nbsp;
+    <a href="configuracion.html">Configuración</a> &nbsp;|&nbsp;
+    <a href="#">Términos</a>
+  </footer>
+
+</body>
+</html>
