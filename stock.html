@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Stock de Vuelos</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Page-specific: #page-stock ── */
+    #page-stock .stock-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+    #page-stock .stock-search {
+      display: flex;
+      gap: .75rem;
+      flex: 1;
+      max-width: 520px;
+      flex-wrap: wrap;
+    }
+    #page-stock .stock-search input,
+    #page-stock .stock-search select {
+      flex: 1;
+      min-width: 160px;
+      padding: .55rem 1rem;
+      border: 1.5px solid #d0d8e4;
+      border-radius: 8px;
+      font-size: .88rem;
+      color: #333;
+      background: #fff;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #page-stock .stock-search input:focus,
+    #page-stock .stock-search select:focus { border-color: var(--color-secondary, #457B9D); }
+
+    #page-stock .stock-table-wrap {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(29,53,87,.08);
+      overflow: hidden;
+    }
+    #page-stock .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .86rem;
+    }
+    #page-stock .stock-table thead {
+      background: #1D3557;
+      color: #fff;
+    }
+    #page-stock .stock-table thead th {
+      padding: .85rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .78rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    #page-stock .stock-table tbody tr {
+      border-bottom: 1px solid #f0f4f8;
+      transition: background .15s;
+    }
+    #page-stock .stock-table tbody tr:hover { background: #f7fafd; }
+    #page-stock .stock-table td { padding: .8rem 1rem; vertical-align: middle; }
+
+    /* Stock bar */
+    #page-stock .stock-bar { display: flex; align-items: center; gap: .6rem; }
+    #page-stock .stock-track { flex: 1; height: 8px; background: #eef2f7; border-radius: 99px; overflow: hidden; }
+    #page-stock .stock-fill  { height: 100%; border-radius: 99px; background: #2a9d8f; }
+    #page-stock .stock-fill.warn  { background: #e9c46a; }
+    #page-stock .stock-fill.crit  { background: #E63946; }
+    #page-stock .stock-num   { font-size: .78rem; color: #666; white-space: nowrap; }
+
+    /* Badges */
+    #page-stock .status-ok   { display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#d4f1eb;color:#1a7a65;font-size:.75rem;font-weight:600; }
+    #page-stock .status-warn { display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#fff3cd;color:#856404;font-size:.75rem;font-weight:600; }
+    #page-stock .status-crit { display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#fde8ea;color:#B01A24;font-size:.75rem;font-weight:600;animation:pulse 1.4s infinite; }
+    #page-stock .status-susp { display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#e9ecef;color:#666;font-size:.75rem;font-weight:600; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    /* Action buttons */
+    #page-stock .btn-edit {
+      padding:.35rem .8rem;border-radius:7px;border:1.5px solid #457B9D;
+      color:#457B9D;background:transparent;font-size:.78rem;cursor:pointer;
+      transition:all .2s;white-space:nowrap;
+    }
+    #page-stock .btn-edit:hover { background:#457B9D;color:#fff; }
+    #page-stock .btn-susp {
+      padding:.35rem .8rem;border-radius:7px;border:1.5px solid #E63946;
+      color:#E63946;background:transparent;font-size:.78rem;cursor:pointer;
+      transition:all .2s;white-space:nowrap;
+    }
+    #page-stock .btn-susp:hover { background:#E63946;color:#fff; }
+    #page-stock .action-cell { display:flex;gap:.4rem; }
+
+    /* Summary cards */
+    #page-stock .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    #page-stock .sum-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 2px 10px rgba(29,53,87,.07);
+      text-align: center;
+    }
+    #page-stock .sum-card .sc-val { font-size: 1.75rem; font-weight: 700; color: #1D3557; }
+    #page-stock .sum-card .sc-lbl { font-size: .75rem; color: #888; margin-top: .2rem; }
+
+    /* Modal overlay */
+    #page-stock .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #page-stock .modal-overlay.open { display: flex; }
+    #page-stock .modal-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    #page-stock .modal-box h3 { margin: 0 0 1rem; color: #1D3557; font-size: 1.05rem; }
+    #page-stock .modal-box label { display: block; font-size: .82rem; font-weight: 600; color: #555; margin-bottom: .3rem; }
+    #page-stock .modal-box input {
+      width: 100%; padding: .6rem .9rem;
+      border: 1.5px solid #d0d8e4; border-radius: 8px;
+      font-size: .9rem; margin-bottom: 1rem; box-sizing: border-box;
+    }
+    #page-stock .modal-actions { display: flex; gap: .75rem; justify-content: flex-end; }
+    #page-stock .btn-cancel { padding:.5rem 1.1rem;border-radius:8px;border:1.5px solid #ccc;background:#fff;color:#666;cursor:pointer;font-size:.85rem; }
+    #page-stock .btn-save   { padding:.5rem 1.3rem;border-radius:8px;border:none;background:#1D3557;color:#fff;cursor:pointer;font-size:.85rem;font-weight:600; }
+    #page-stock .alert-crit-banner {
+      background: #fde8ea;
+      border-left: 4px solid #E63946;
+      border-radius: 10px;
+      padding: .9rem 1.2rem;
+      font-size: .85rem;
+      color: #B01A24;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+  </style>
+</head>
+<body id="page-stock">
+
+  <!-- Navegación -->
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🗺 Explorar</a>
+        <a href="perfil.html">👤 Perfil</a>
+        <a href="reservas.html">📋 Reservas</a>
+        <a href="calendario.html">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="stock.html" class="active">✈ Vuelos</a>
+        <a href="configuracion.html">⚙ Config</a>
+      </div>
+      <div class="nav-user">
+        <div class="nav-avatar">AG</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page header -->
+  <section style="background:linear-gradient(135deg,#1D3557 0%,#457B9D 100%);padding:2.5rem 0;color:#fff;margin-bottom:2rem;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+      <h1 style="font-size:1.75rem;font-weight:700;margin:0 0 .25rem;">✈ Control de Stock y Disponibilidad</h1>
+      <p style="opacity:.8;margin:0;">Inventario de vuelos en tiempo real · Panel Operativo</p>
+    </div>
+  </section>
+
+  <section class="page-section" style="padding:0 0 3rem;">
+    <div class="container" style="max-width:1200px;margin:0 auto;padding:0 2rem;">
+
+      <!-- Summary -->
+      <div class="summary-grid">
+        <div class="sum-card">
+          <div class="sc-val">24</div>
+          <div class="sc-lbl">Vuelos activos</div>
+        </div>
+        <div class="sum-card">
+          <div class="sc-val" style="color:#2a9d8f;">4.320</div>
+          <div class="sc-lbl">Asientos disponibles</div>
+        </div>
+        <div class="sum-card">
+          <div class="sc-val" style="color:#e9c46a;">3</div>
+          <div class="sc-lbl">Con stock bajo (&lt;20%)</div>
+        </div>
+        <div class="sum-card">
+          <div class="sc-val" style="color:#E63946;">2</div>
+          <div class="sc-lbl">⚠ Stock crítico (&lt;10%)</div>
+        </div>
+        <div class="sum-card">
+          <div class="sc-val" style="color:#888;">1</div>
+          <div class="sc-lbl">Suspendidos</div>
+        </div>
+      </div>
+
+      <!-- Alert banner -->
+      <div class="alert-crit-banner">
+        ⚠️ <strong>Atención:</strong> 2 vuelos tienen menos del 10% de disponibilidad. Revisá y ampliá el cupo antes de que se agoten.
+      </div>
+
+      <!-- Search bar -->
+      <div class="stock-header-bar">
+        <div class="stock-search">
+          <input type="text" id="searchInput" placeholder="🔍 Buscar por código o ruta…" oninput="filterFlights()">
+          <select id="statusFilter" onchange="filterFlights()">
+            <option value="all">Todos los estados</option>
+            <option value="ok">Disponible</option>
+            <option value="warn">Stock Bajo</option>
+            <option value="crit">Stock Crítico</option>
+            <option value="susp">Suspendido</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="alert('Nuevo vuelo: funcionalidad en desarrollo.')">+ Agregar vuelo</button>
+      </div>
+
+      <!-- Table -->
+      <div class="stock-table-wrap">
+        <table class="stock-table" id="flightTable">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Origen → Destino</th>
+              <th>Aerolínea</th>
+              <th>Fecha</th>
+              <th>Cap. Total</th>
+              <th>Vendidos</th>
+              <th>Disponibles</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="flightBody">
+
+            <tr data-status="ok">
+              <td><strong>AR-1042</strong></td>
+              <td>Buenos Aires → Cancún</td>
+              <td>Aerolíneas Arg.</td>
+              <td>15 Jun 2025</td>
+              <td>180</td>
+              <td>98</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill" style="width:54%"></div></div>
+                  <span class="stock-num">82 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-ok">✓ Disponible</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('AR-1042',180,98)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="ok">
+              <td><strong>LA-2310</strong></td>
+              <td>Santiago → Madrid</td>
+              <td>LATAM Airlines</td>
+              <td>18 Jun 2025</td>
+              <td>220</td>
+              <td>145</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill" style="width:66%"></div></div>
+                  <span class="stock-num">75 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-ok">✓ Disponible</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('LA-2310',220,145)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="crit">
+              <td><strong>AR-0891</strong></td>
+              <td>Buenos Aires → Bariloche</td>
+              <td>Aerolíneas Arg.</td>
+              <td>20 Jun 2025</td>
+              <td>150</td>
+              <td>146</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill crit" style="width:97%"></div></div>
+                  <span class="stock-num" style="color:#E63946;font-weight:700;">4 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-crit">⚠ Stock Crítico</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('AR-0891',150,146)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="warn">
+              <td><strong>IB-5540</strong></td>
+              <td>Madrid → Roma</td>
+              <td>Iberia</td>
+              <td>22 Jun 2025</td>
+              <td>200</td>
+              <td>172</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill warn" style="width:86%"></div></div>
+                  <span class="stock-num" style="color:#856404;font-weight:600;">28 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-warn">⚡ Stock Bajo</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('IB-5540',200,172)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="ok">
+              <td><strong>CM-3301</strong></td>
+              <td>Panamá → Lima</td>
+              <td>Copa Airlines</td>
+              <td>25 Jun 2025</td>
+              <td>160</td>
+              <td>72</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill" style="width:45%"></div></div>
+                  <span class="stock-num">88 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-ok">✓ Disponible</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('CM-3301',160,72)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="crit">
+              <td><strong>AR-1155</strong></td>
+              <td>Buenos Aires → Ushuaia</td>
+              <td>Aerolíneas Arg.</td>
+              <td>28 Jun 2025</td>
+              <td>130</td>
+              <td>127</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill crit" style="width:98%"></div></div>
+                  <span class="stock-num" style="color:#E63946;font-weight:700;">3 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-crit">⚠ Stock Crítico</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('AR-1155',130,127)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="warn">
+              <td><strong>LA-8802</strong></td>
+              <td>Lima → Cusco</td>
+              <td>LATAM Airlines</td>
+              <td>30 Jun 2025</td>
+              <td>100</td>
+              <td>84</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill warn" style="width:84%"></div></div>
+                  <span class="stock-num" style="color:#856404;font-weight:600;">16 asientos</span>
+                </div>
+              </td>
+              <td><span class="status-warn">⚡ Stock Bajo</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('LA-8802',100,84)">✏ Editar</button>
+                <button class="btn-susp" onclick="suspendFlight(this)">⏸ Suspender</button>
+              </td>
+            </tr>
+
+            <tr data-status="susp">
+              <td><strong>UX-4410</strong></td>
+              <td>Buenos Aires → Punta Cana</td>
+              <td>Air Europa</td>
+              <td>05 Jul 2025</td>
+              <td>190</td>
+              <td>—</td>
+              <td>
+                <div class="stock-bar">
+                  <div class="stock-track"><div class="stock-fill" style="width:0%;background:#ccc"></div></div>
+                  <span class="stock-num" style="color:#aaa;">Suspendido</span>
+                </div>
+              </td>
+              <td><span class="status-susp">⏸ Suspendido</span></td>
+              <td class="action-cell">
+                <button class="btn-edit" onclick="openModal('UX-4410',190,0)">✏ Editar</button>
+                <button class="btn-edit" style="border-color:#2a9d8f;color:#2a9d8f;" onclick="alert('Vuelo reactivado.')">▶ Reactivar</button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal de edición -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <h3>✏ Editar Cupo — Vuelo <span id="modalCode"></span></h3>
+      <label>Capacidad Total</label>
+      <input type="number" id="modalCap" min="1">
+      <label>Asientos Vendidos</label>
+      <input type="number" id="modalSold" min="0">
+      <label>Nuevo Cupo Disponible</label>
+      <input type="number" id="modalAvail" readonly style="background:#f8f9fa;color:#888;">
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-save" onclick="saveModal()">💾 Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística &nbsp;|&nbsp;
+    <a href="configuracion.html">Configuración</a> &nbsp;|&nbsp;
+    <a href="#">Términos</a>
+  </footer>
+
+  <script>
+    function filterFlights() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const s = document.getElementById('statusFilter').value;
+      document.querySelectorAll('#flightBody tr').forEach(tr => {
+        const text = tr.textContent.toLowerCase();
+        const status = tr.dataset.status;
+        const matchQ = !q || text.includes(q);
+        const matchS = s === 'all' || status === s;
+        tr.style.display = matchQ && matchS ? '' : 'none';
+      });
+    }
+
+    function openModal(code, cap, sold) {
+      document.getElementById('modalCode').textContent = code;
+      document.getElementById('modalCap').value = cap;
+      document.getElementById('modalSold').value = sold;
+      document.getElementById('modalAvail').value = cap - sold;
+      document.getElementById('editModal').classList.add('open');
+      document.getElementById('modalCap').addEventListener('input', updateAvail);
+      document.getElementById('modalSold').addEventListener('input', updateAvail);
+    }
+
+    function updateAvail() {
+      const cap  = parseInt(document.getElementById('modalCap').value)  || 0;
+      const sold = parseInt(document.getElementById('modalSold').value) || 0;
+      document.getElementById('modalAvail').value = Math.max(0, cap - sold);
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    function saveModal() {
+      alert('✅ Cambios guardados correctamente.');
+      closeModal();
+    }
+
+    function suspendFlight(btn) {
+      if (confirm('¿Suspender temporalmente las ventas de este vuelo?')) {
+        const row = btn.closest('tr');
+        row.dataset.status = 'susp';
+        row.querySelector('.status-ok, .status-warn, .status-crit') && (row.querySelector('[class^="status"]').outerHTML = '<span class="status-susp">⏸ Suspendido</span>');
+        alert('Vuelo suspendido.');
+      }
+    }
+  </script>
+
+</body>
+</html>
