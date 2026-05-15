@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Calendario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body id="page-calendar">
+
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🗺 Explorar</a>
+        <a href="perfil.html">👤 Perfil</a>
+        <a href="reservas.html">📋 Reservas</a>
+        <a href="calendario.html" class="active">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="stock.html">✈ Vuelos</a>
+        <a href="configuracion.html">⚙ Config</a>
+      </div>
+      <div class="nav-user"><div class="nav-avatar">AG</div></div>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb">Inicio &rsaquo; <span>Calendario</span></div>
+      <h1>📅 Mis Viajes</h1>
+      <p>Planificá y visualizá tus próximas aventuras</p>
+    </div>
+  </div>
+
+  <div class="page-inner">
+    <div class="cal-layout">
+
+      <!-- Calendario -->
+      <div class="calendar-grid">
+        <div class="cal-header">
+          <h3 id="calTitle">Agosto 2025</h3>
+          <div class="cal-nav">
+            <button onclick="prevMonth()">‹</button>
+            <button onclick="nextMonth()">›</button>
+          </div>
+        </div>
+
+        <div class="cal-days-header">
+          <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span>
+          <span>Jue</span><span>Vie</span><span>Sáb</span>
+        </div>
+
+        <div class="cal-days" id="calDays"></div>
+
+        <!-- Detalle del día seleccionado -->
+        <div id="dayDetail" style="display:none; margin-top:24px; padding:20px; background:var(--color-bg-alt); border-radius:var(--radius-md);">
+          <h4 id="dayDetailTitle" style="color:var(--color-primary); margin-bottom:12px;"></h4>
+          <div id="dayDetailContent"></div>
+        </div>
+
+        <div style="margin-top:24px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm">+ Agregar Recordatorio</button>
+          <button class="btn btn-outline btn-sm">🔄 Sincronizar Actividades</button>
+        </div>
+      </div>
+
+      <!-- Sidebar de eventos -->
+      <aside class="event-sidebar">
+        <h3 style="color:var(--color-primary); margin-bottom:16px; font-family:var(--font-display);">Próximos Eventos</h3>
+
+        <div class="event-card urgent">
+          <div class="event-date">📅 15 Ago 2025</div>
+          <div class="event-title">✈ Vuelo a Bariloche</div>
+          <div class="event-detail">Aerolíneas Argentinas · Salida 09:45h</div>
+          <div class="event-code">#AR1042 · EZE → BRC</div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-date">📅 15 Ago 2025</div>
+          <div class="event-title">🏨 Check-in Hotel Llao Llao</div>
+          <div class="event-detail">Check-in desde 14:00h · 7 noches</div>
+          <div class="event-code">#RES-8842</div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-date">📅 18 Ago 2025</div>
+          <div class="event-title">🚤 Excursión Lacustre</div>
+          <div class="event-detail">Lago Nahuel Huapi · Salida 10:00h</div>
+          <div class="event-code">#EXC-221</div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-date">📅 20 Ago 2025</div>
+          <div class="event-title">🎿 Cerro Catedral</div>
+          <div class="event-detail">Ski day pass incluido · Todo el día</div>
+          <div class="event-code">#ACT-559</div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-date">📅 22 Ago 2025</div>
+          <div class="event-title">✈ Vuelta a Buenos Aires</div>
+          <div class="event-detail">Aerolíneas Argentinas · Salida 17:20h</div>
+          <div class="event-code">#AR1051 · BRC → EZE</div>
+        </div>
+
+        <div class="event-card" style="border-color:var(--color-muted); opacity:0.7;">
+          <div class="event-date">📅 10 Oct 2025</div>
+          <div class="event-title">✈ Vuelo a Madrid</div>
+          <div class="event-detail">Iberia · Salida 23:55h</div>
+          <div class="event-code">#IB6843 · EZE → MAD</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística
+  </footer>
+
+  <script>
+    const events = {
+      '2025-8-15': ['✈ Vuelo a Bariloche (09:45h) — #AR1042', '🏨 Check-in Llao Llao'],
+      '2025-8-18': ['🚤 Excursión Lacustre (10:00h)'],
+      '2025-8-20': ['🎿 Cerro Catedral — ski day'],
+      '2025-8-22': ['✈ Regreso a Buenos Aires (17:20h) — #AR1051'],
+    };
+
+    let year = 2025, month = 7; // 0-indexed, 7 = agosto
+
+    const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    function renderCalendar() {
+      document.getElementById('calTitle').textContent = monthNames[month] + ' ' + year;
+      const container = document.getElementById('calDays');
+      container.innerHTML = '';
+
+      const first = new Date(year, month, 1).getDay();
+      const days = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+
+      for (let i = 0; i < first; i++) {
+        const el = document.createElement('div');
+        el.className = 'cal-day empty';
+        container.appendChild(el);
+      }
+
+      for (let d = 1; d <= days; d++) {
+        const el = document.createElement('div');
+        el.className = 'cal-day';
+        el.textContent = d;
+        const key = `${year}-${month+1}-${d}`;
+        if (events[key]) el.classList.add('has-event');
+        if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === d) el.classList.add('today');
+        el.addEventListener('click', () => selectDay(d, key, el));
+        container.appendChild(el);
+      }
+    }
+
+    function selectDay(d, key, el) {
+      document.querySelectorAll('.cal-day.selected').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+      const detail = document.getElementById('dayDetail');
+      const title  = document.getElementById('dayDetailTitle');
+      const content = document.getElementById('dayDetailContent');
+      title.textContent = `${d} de ${monthNames[month]} ${year}`;
+      if (events[key]) {
+        content.innerHTML = events[key].map(e => `<p style="margin-bottom:6px; font-size:0.9rem;">• ${e}</p>`).join('');
+      } else {
+        content.innerHTML = '<p class="text-muted" style="font-size:0.88rem;">Sin eventos para este día.</p>';
+      }
+      detail.style.display = '';
+    }
+
+    function prevMonth() { if (month === 0) { month = 11; year--; } else month--; renderCalendar(); }
+    function nextMonth() { if (month === 11) { month = 0; year++; } else month++; renderCalendar(); }
+
+    renderCalendar();
+  </script>
+
+</body>
+</html>
