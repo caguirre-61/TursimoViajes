@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Mi Perfil</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body id="page-profile">
+
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🗺 Explorar</a>
+        <a href="perfil.html" class="active">👤 Perfil</a>
+        <a href="reservas.html">📋 Reservas</a>
+        <a href="calendario.html">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="stock.html">✈ Vuelos</a>
+        <a href="configuracion.html">⚙ Config</a>
+      </div>
+      <div class="nav-user"><div class="nav-avatar">AG</div></div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb">Inicio &rsaquo; <span>Mi Perfil</span></div>
+      <h1>👤 Mi Perfil</h1>
+      <p>Gestioná tu información personal y preferencias de viaje</p>
+    </div>
+  </div>
+
+  <div class="page-inner">
+    <div class="profile-layout">
+
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="avatar-wrap">
+          <img src="https://i.pravatar.cc/150?img=12" alt="Avatar" id="avatarImg">
+          <button class="avatar-btn" onclick="document.getElementById('fileInput').click()">✏</button>
+          <input type="file" id="fileInput" style="display:none" accept="image/*" onchange="changeAvatar(event)">
+        </div>
+        <p class="profile-name">Agustín García</p>
+        <p class="profile-email">agustin@email.com</p>
+        <span class="badge badge-success">Viajero Frecuente</span>
+
+        <div class="profile-stats">
+          <div class="pstat">
+            <div class="pstat-val">14</div>
+            <div class="pstat-lbl">Viajes</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-val">6</div>
+            <div class="pstat-lbl">Países</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-val">32k</div>
+            <div class="pstat-lbl">Km</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-val">4.8</div>
+            <div class="pstat-lbl">Rating</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="profile-main">
+
+        <!-- Datos personales -->
+        <section class="profile-section">
+          <h3>📋 Datos Personales</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" value="Agustín">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Apellido</label>
+              <input type="text" class="form-control" value="García">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" value="agustin@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input type="tel" class="form-control" value="+54 9 11 5555-1234">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ciudad de Origen (para cálculo de vuelos)</label>
+            <select class="form-control">
+              <option selected>Buenos Aires (EZE)</option>
+              <option>Córdoba (COR)</option>
+              <option>Mendoza (MDZ)</option>
+              <option>Rosario (ROS)</option>
+              <option>Bariloche (BRC)</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Preferencias -->
+        <section class="profile-section">
+          <h3>✈ Preferencias de Viaje</h3>
+          <p class="text-muted mb-2" style="font-size:0.85rem">Seleccioná tus preferencias para mejorar tus recomendaciones</p>
+
+          <h4 style="font-size:0.9rem; color:var(--color-secondary); margin-bottom:12px; margin-top:16px;">Asiento de vuelo</h4>
+          <div class="pref-grid">
+            <label class="pref-check"><input type="radio" name="asiento" checked> 🪟 Ventana</label>
+            <label class="pref-check"><input type="radio" name="asiento"> 🚶 Pasillo</label>
+            <label class="pref-check"><input type="radio" name="asiento"> 💺 Sin preferencia</label>
+          </div>
+
+          <h4 style="font-size:0.9rem; color:var(--color-secondary); margin-bottom:12px; margin-top:20px;">Tipo de alojamiento</h4>
+          <div class="pref-grid">
+            <label class="pref-check"><input type="checkbox" checked> 🏨 Hotel</label>
+            <label class="pref-check"><input type="checkbox"> 🏠 Airbnb</label>
+            <label class="pref-check"><input type="checkbox" checked> 🏝 Resort Todo Incluido</label>
+            <label class="pref-check"><input type="checkbox"> ⛺ Glamping</label>
+          </div>
+
+          <h4 style="font-size:0.9rem; color:var(--color-secondary); margin-bottom:12px; margin-top:20px;">Restricciones alimenticias</h4>
+          <div class="pref-grid">
+            <label class="pref-check"><input type="checkbox"> 🌱 Vegetariano</label>
+            <label class="pref-check"><input type="checkbox"> 🌿 Vegano</label>
+            <label class="pref-check"><input type="checkbox"> 🚫 Sin gluten</label>
+            <label class="pref-check"><input type="checkbox"> 🥜 Sin maní</label>
+            <label class="pref-check"><input type="checkbox" checked> ✅ Sin restricciones</label>
+          </div>
+        </section>
+
+        <!-- Guardar -->
+        <section class="profile-section">
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-lg" onclick="guardarCambios()">💾 Guardar Cambios</button>
+            <button class="btn btn-outline">↩ Cancelar</button>
+          </div>
+          <div class="success-msg" id="successMsg">✅ ¡Cambios guardados correctamente!</div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística
+  </footer>
+
+  <script>
+    function guardarCambios() {
+      const msg = document.getElementById('successMsg');
+      msg.classList.add('show');
+      setTimeout(() => msg.classList.remove('show'), 3000);
+    }
+    function changeAvatar(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => document.getElementById('avatarImg').src = ev.target.result;
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+
+</body>
+</html>
