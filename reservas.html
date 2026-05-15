@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaHorizonte — Reservar Viaje</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body id="page-booking">
+
+  <nav class="main-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">✈</div>
+        Vía<span>Horizonte</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🗺 Explorar</a>
+        <a href="perfil.html">👤 Perfil</a>
+        <a href="reservas.html" class="active">📋 Reservas</a>
+        <a href="calendario.html">📅 Calendario</a>
+        <a href="historial.html">🕓 Historial</a>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="stock.html">✈ Vuelos</a>
+        <a href="configuracion.html">⚙ Config</a>
+      </div>
+      <div class="nav-user"><div class="nav-avatar">AG</div></div>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb">Inicio &rsaquo; <span>Nueva Reserva</span></div>
+      <h1>📋 Nueva Reserva</h1>
+      <p>Completá los datos para confirmar tu viaje</p>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <!-- Indicador de pasos -->
+    <div class="step-indicator" id="stepIndicator">
+      <div class="step active" id="step1-label">1. Destino</div>
+      <div class="step" id="step2-label">2. Pasajeros</div>
+      <div class="step" id="step3-label">3. Pago</div>
+      <div class="step" id="step4-label">✓ Confirmación</div>
+    </div>
+
+    <div class="booking-layout">
+      <!-- Panel principal -->
+      <div>
+
+        <!-- Paso 1: Destino -->
+        <div id="stepContent1" class="booking-panel">
+          <h3>🌍 Destino Seleccionado</h3>
+          <div class="dest-summary">
+            <img src="https://images.unsplash.com/photo-1531761535209-180857e963b9?w=200&q=80" alt="Bariloche">
+            <div>
+              <h4>Bariloche — Argentina</h4>
+              <p class="text-muted" style="font-size:0.85rem">Paquete turístico con alojamiento 4★ y traslados</p>
+              <span class="badge badge-success mt-1">✅ Disponible</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">📅 Fecha de Ida</label>
+              <input type="date" class="form-control" value="2025-08-15">
+            </div>
+            <div class="form-group">
+              <label class="form-label">📅 Fecha de Vuelta</label>
+              <input type="date" class="form-control" value="2025-08-22">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">✈ Clase de Vuelo</label>
+            <select class="form-control">
+              <option>💺 Económica — incluida en precio base</option>
+              <option>🥂 Premium Economy — + $150 / persona</option>
+              <option>👔 Business — + $450 / persona</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" onclick="nextStep(2)">Continuar → Pasajeros</button>
+        </div>
+
+        <!-- Paso 2: Pasajeros -->
+        <div id="stepContent2" class="booking-panel" style="display:none">
+          <h3>👥 Datos de Pasajeros</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Adultos</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button class="btn btn-outline btn-sm" onclick="changeCount('adults',-1)">−</button>
+                <input type="number" class="form-control" id="adults" value="2" min="1" max="9" style="text-align:center; width:70px;">
+                <button class="btn btn-outline btn-sm" onclick="changeCount('adults',1)">+</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Niños (2-12 años)</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button class="btn btn-outline btn-sm" onclick="changeCount('children',-1)">−</button>
+                <input type="number" class="form-control" id="children" value="1" min="0" max="6" style="text-align:center; width:70px;">
+                <button class="btn btn-outline btn-sm" onclick="changeCount('children',1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <h4 style="color:var(--color-secondary); margin:16px 0 12px;">Pasajero 1 (Titular)</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" value="Agustín">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Apellido</label>
+              <input type="text" class="form-control" value="García">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">DNI / Pasaporte</label>
+              <input type="text" class="form-control" placeholder="35.000.000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha de Nacimiento</label>
+              <input type="date" class="form-control" value="1992-05-14">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top:4px;">
+            <button class="btn btn-outline" onclick="nextStep(1)">← Volver</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Continuar → Pago</button>
+          </div>
+        </div>
+
+        <!-- Paso 3: Pago -->
+        <div id="stepContent3" class="booking-panel" style="display:none">
+          <h3>💳 Datos de Pago</h3>
+
+          <div class="alert alert-warning">🔒 Tus datos de pago están protegidos con encriptación SSL 256-bit</div>
+
+          <div class="form-group">
+            <label class="form-label">Titular de la tarjeta</label>
+            <input type="text" class="form-control" placeholder="NOMBRE APELLIDO">
+          </div>
+          <div class="form-group card-input">
+            <label class="form-label">Número de tarjeta</label>
+            <input type="text" class="form-control" placeholder="•••• •••• •••• ••••" maxlength="19">
+            <div class="card-icons">💳 VISA / MC</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Vencimiento</label>
+              <input type="text" class="form-control" placeholder="MM/AA" maxlength="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input type="text" class="form-control" placeholder="•••" maxlength="4">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cuotas</label>
+            <select class="form-control">
+              <option>1 cuota sin interés — $840</option>
+              <option>3 cuotas sin interés — $280/mes</option>
+              <option>6 cuotas — $144/mes (+ 3%)</option>
+              <option>12 cuotas — $76/mes (+ 8%)</option>
+            </select>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top:4px;">
+            <button class="btn btn-outline" onclick="nextStep(2)">← Volver</button>
+            <button class="btn btn-accent btn-lg" onclick="confirmarReserva()">✅ Confirmar y Pagar $840</button>
+          </div>
+        </div>
+
+        <!-- Paso 4: Confirmación -->
+        <div id="stepContent4" class="booking-panel" style="display:none; text-align:center;">
+          <div style="font-size:4rem; margin-bottom:16px;">🎉</div>
+          <h3 style="color:var(--color-success);">¡Reserva Confirmada!</h3>
+          <p class="text-muted mt-2">Tu código de reserva es <strong style="font-family:monospace; font-size:1.1rem;">#VH-2025-04187</strong></p>
+          <p class="text-muted mt-1">Recibirás la confirmación en <strong>agustin@email.com</strong></p>
+          <div style="display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap;">
+            <a href="calendario.html" class="btn btn-primary">📅 Ver en Calendario</a>
+            <a href="historial.html" class="btn btn-outline">📜 Ver Historial</a>
+            <a href="index.html" class="btn btn-secondary">🗺 Seguir Explorando</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen de precio -->
+      <aside>
+        <div class="booking-panel" style="position:sticky; top:88px;">
+          <h3>💰 Resumen de Precio</h3>
+          <div class="price-breakdown">
+            <div class="price-row"><span>Bariloche — 7 noches</span><span>$420</span></div>
+            <div class="price-row"><span>2 adultos × $420</span><span>$840</span></div>
+            <div class="price-row"><span>1 niño × $210</span><span>$210</span></div>
+            <div class="price-row"><span>Tasas aeroportuarias</span><span>$62</span></div>
+            <div class="price-row"><span>Seguro de viaje</span><span>$28</span></div>
+            <div class="price-row total"><span>TOTAL</span><span style="color:var(--color-primary);">$1.140</span></div>
+          </div>
+          <p class="form-hint mt-2">💡 Precio en USD. Podés pagar en ARS según cotización del día.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <strong>VíaHorizonte</strong> &copy; 2025 — Plataforma de Gestión Turística
+  </footer>
+
+  <script>
+    let currentStep = 1;
+
+    function nextStep(step) {
+      document.getElementById('stepContent' + currentStep).style.display = 'none';
+      document.getElementById('step' + currentStep + '-label').classList.remove('active');
+      document.getElementById('step' + currentStep + '-label').classList.add(step > currentStep ? 'done' : '');
+      currentStep = step;
+      document.getElementById('stepContent' + currentStep).style.display = '';
+      document.getElementById('step' + currentStep + '-label').classList.add('active');
+    }
+
+    function confirmarReserva() { nextStep(4); }
+
+    function changeCount(id, delta) {
+      const el = document.getElementById(id);
+      el.value = Math.max(parseInt(el.min), Math.min(parseInt(el.max), parseInt(el.value) + delta));
+    }
+  </script>
+
+</body>
+</html>
